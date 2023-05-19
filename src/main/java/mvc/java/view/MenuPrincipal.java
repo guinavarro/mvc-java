@@ -28,11 +28,45 @@ public class MenuPrincipal {
         menuCadastroUsuario.addActionListener(new ActionListener(){
            @Override
            public void actionPerformed(ActionEvent e){
+               frame.getContentPane().removeAll();
+               frame.getContentPane().add(menu, BorderLayout.NORTH);
+               
                CadastroUsuario cadastroUsuarioView = new CadastroUsuario();
                cadastroUsuarioView.setFrame(frame);
+               
                cadastroUsuarioView.criarCadastroUsuario();
            }
         });
+        
+        menuCadastro.add(menuCadastroUsuario);
+        menu.add(menuCadastro);
+        
+        JMenu menuProcura = new JMenu();
+        menuProcura.setText("Procura");
+        
+        JMenuItem menuProcuraUsuario = new JMenuItem();
+        menuProcuraUsuario.setText("Usuário");
+        
+        menuProcuraUsuario.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               frame.getContentPane().removeAll();
+               frame.getContentPane().add(menu, BorderLayout.NORTH);
+               
+               ProcuraUsuario procuraUsuario = new ProcuraUsuario();
+               procuraUsuario.setFrame(frame);
+               procuraUsuario.criarProcuraUsuario();
+           }
+            
+        });
+        
+        menuProcura.add(menuProcuraUsuario);
+        menu.add(menuProcura);
+        
+        frame.setLayout(new BorderLayout());
+        frame.getContentPane().add(menu, BorderLayout.NORTH);
+        frame.setSize(500, 300);
+        frame.setVisible(true);
     }
     
 }

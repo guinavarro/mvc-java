@@ -15,6 +15,10 @@ public class Usuario {
         private String nome;
         private TipoUsuario tipoUsuario;
         
+        public Usuario(){
+            tipoUsuario = new TipoUsuario();
+        }
+        
         public int getId(){
             return id;
         }
