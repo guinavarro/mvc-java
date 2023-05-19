@@ -4,22 +4,27 @@
  */
 package mvc.java.view;
 
+import mvc.java.controller.UsuarioController;
+import mvc.java.model.Usuario;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
-import mvc.java.controller.UsuarioController;
-import mvc.java.model.Usuario;
+
 
 /**
  *
@@ -40,6 +45,10 @@ public class ProcuraUsuario {
         JPanel panelBuscaUsuario = new JPanel();
         JPanel panelBuscaBotoes = new JPanel();
         JPanel panelProcuraUsuario = new JPanel();
+        
+        UsuarioController usuarioController = new UsuarioController();
+        DefaultTableModel tableModel = new DefaultTableModel();
+        JTable table = new JTable(tableModel);
         
         JLabel labelNome = new JLabel();
         labelNome.setText("Nome");
@@ -67,11 +76,70 @@ public class ProcuraUsuario {
         JButton buttonProcurar = new JButton();
         buttonProcurar.setText("Procurar");
         
+        buttonProcurar.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               tableModel.setNumRows(0);
+               List<Usuario> usuarios = new ArrayList<Usuario>();
+               
+               for(Usuario usuario: usuarioController.findByNomeOuCpf(
+                       textNome.getText(), jFormattedCpf.getText())){
+                       tableModel.addRow(new Object[]{
+                           usuario.getId(), usuario.getNome(), usuario.getCpf(),
+                           usuario.getTipoUsuario().getId()
+                       });
+               }
+           }                     
+           
+        });
+        
         JButton buttonAlterar = new JButton();
         buttonAlterar.setText("Alterar");
         
+         buttonAlterar.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               int linhaSelecionada = -1;
+               linhaSelecionada = table.getSelectedRow();
+               
+               if(linhaSelecionada >= 0){
+                   int id = (int) table.getValueAt(linhaSelecionada, 0);
+                   
+                   frame.getContentPane().removeAll();
+                   CadastroUsuario cadastroUsuario = new CadastroUsuario();
+                   cadastroUsuario.setFrame(frame);
+                   
+                   Usuario usuarioAlteracao = usuarioController.findById(id);
+                   cadastroUsuario.setUsuarioAlteracao(usuarioAlteracao);
+                   cadastroUsuario.criarCadastroUsuario();
+               }else{
+                   JOptionPane.showMessageDialog(null,
+                           "Usuario não selecionado para alteração!");
+               }
+           }                     
+           
+        });
+        
         JButton buttonExcluir = new JButton();
         buttonExcluir.setText("Excluir");
+        
+        buttonExcluir.addActionListener(new ActionListener(){
+           @Override
+           public void actionPerformed(ActionEvent e){
+               int linhaSelecionada = -1;
+               linhaSelecionada = table.getSelectedRow();
+               
+               if(linhaSelecionada >= 0){
+               
+                   int id = (int) table.getValueAt(linhaSelecionada, 0);
+                   usuarioController.delete(id);
+               }else{ 
+                   JOptionPane.showMessageDialog(null,
+                           "Usuário não selecionado para exclusão");
+               }
+               
+           }
+        });
         
         JButton buttonFechar = new JButton();
         buttonFechar.setText("Fechar");
@@ -81,10 +149,8 @@ public class ProcuraUsuario {
             public void actionPerformed(ActionEvent e){
                 frame.dispose();
             }
-        });
-        
-        DefaultTableModel tableModel = new DefaultTableModel();
-        JTable table = new JTable(tableModel);
+        });        
+    
         
         tableModel.addColumn("Id");
         tableModel.addColumn("Nome");
@@ -96,7 +162,6 @@ public class ProcuraUsuario {
         table.getColumnModel().getColumn(2).setPreferredWidth(80);
         table.getColumnModel().getColumn(3).setPreferredWidth(120);
         
-        UsuarioController usuarioController = new UsuarioController();
         
         tableModel.setNumRows(0);
         
